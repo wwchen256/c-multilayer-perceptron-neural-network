@@ -1,3 +1,8 @@
+nn (neural network) is a C implementation of a multi-layer perceptron, also known as a neural network.  
+All options are specified in the nn.config file.
+The number of layers, and number of nodes in each layer is arbitrary, determined in the variable STATE_SIZE_LIST of nn.config.
+Activation functions from input to hidden layers and to output layers are all via a sigmoidal function, so nn is suitable as a classifier but not predictor without more changes to the output function.
+
 Installation instructions:
 
 The latest version of this software is located in the github repository: https://github.com/wwchen256/c-multilayer-perceptron
