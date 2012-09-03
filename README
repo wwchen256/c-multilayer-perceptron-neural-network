@@ -1,0 +1,10 @@
+Installation instructions:
+
+The latest version of this software is located in the github repository: https://github.com/wwchen256/c-multilayer-perceptron
+
+To install, clone the remote repository to your local machine and type 'make' in the local repository directory.
+The binary should be installed in the root of the local repository.
+
+To run, inspect the nn.config file to see which data set is being used to train the neural network.  Adjust parameters accordingly.  The binary is named 'nn' (neural network) so enter './nn' at the command line.
+
+Compilation requires gcc and math libraries.
