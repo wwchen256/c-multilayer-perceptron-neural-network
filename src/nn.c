@@ -13,6 +13,8 @@ int *layerSizeList;
 float learningRate=0;
 int iterations;
 char *trainingFileName;
+char *wImportFileName;
+char *wExportFileName;
 int numberOfFacts=0;
 int reportFrequency=0;
 int reportW=0;
@@ -102,6 +104,8 @@ void ReadConfigFile(char *filename){
   char layerSizeListString[BUFFERSIZE]; 
   char trainingFileNameString[BUFFERSIZE]; 
   char buffer[BUFFERSIZE];
+  char wImportFileNameString[BUFFERSIZE];
+  char wExportFileNameString[BUFFERSIZE];
   int i;
   
   ifp = fopen(filename, "r");
@@ -131,11 +135,25 @@ void ReadConfigFile(char *filename){
     if ( sscanf(buffer, "REPORT_W%d", &reportW) == 1 ){
       continue;
     }
+    if ( sscanf(buffer, "W_SOURCE_FILE_NAME %s", wImportFileNameString) == 1 ){
+      continue;
+    }
+    if ( sscanf(buffer, "W_EXPORT_FILE_NAME %s", wExportFileNameString) == 1 ){
+      continue;
+    }
   }
 
   fclose(ifp);
 
   // Do some processing here to get the layerSizeList since we have to wait for maxLevels
+  if(strlen(wExportFileNameString)!=0){ 
+    wExportFileName = AllocateCvector(strlen(wExportFileNameString));
+    strcpy(wExportFileName, wExportFileNameString);
+  }
+  if(strlen(wImportFileNameString)!=0){ 
+    wImportFileName = AllocateCvector(strlen(wImportFileNameString));
+    strcpy(wImportFileName, wImportFileNameString);
+  }
   trainingFileName = AllocateCvector(strlen(trainingFileNameString));
   strcpy(trainingFileName, trainingFileNameString);
   layerSizeList = AllocateIvector(maxLevels);
@@ -262,7 +280,8 @@ double Score(double ***w, double **inputStates, double **targetStates){
       rms += (targetStates[i][j] - currentStates[maxLevels][j])*(targetStates[i][j] - currentStates[maxLevels][j]);
     }
   }
-  return ((float)rms) / numberOfFacts;
+  //return ((float)rms) / numberOfFacts;
+  return ((float)rms); 
 }
 
 void PrintW(double ***w, int *layerSizeList){
@@ -410,7 +429,7 @@ void BackPropagate(double **targetInputSet, double **targetOutputSet, double ***
   return;
 }
 
-void ImportW(char *filename, double ***w, int *layerSizeList){
+void ImportW(char *filename, double ***w){
   int i,j,k;
   char line[12000];
   FILE *ifp;
@@ -433,7 +452,7 @@ void ImportW(char *filename, double ***w, int *layerSizeList){
 }
 	
 
-void ExportW(char *filename, double ***w, int *layerSizeList){
+void ExportW(char *filename, double ***w){
   int i,j,k;
   char line[2000];
   FILE *ofp;
@@ -455,6 +474,7 @@ void ExportW(char *filename, double ***w, int *layerSizeList){
   return;
 }
 
+      
 int main(int argc, char *argv[]){
   double **m;
   double **trainingInput, **trainingOutput;
@@ -477,12 +497,24 @@ int main(int argc, char *argv[]){
   w = AllocateW(layerSizeList);
   dw = AllocateW(layerSizeList);
 
-  PopulateW(w);  
+  if(wImportFileName != NULL){
+    ImportW(wImportFileName, w);
+  }
+  else {
+    PopulateW(w);  
+  }
   PopulateStates(states, layerSizeList);
 
   BackPropagate(trainingInput, trainingOutput, w, layerSizeList, iterations);
 
   FinalReport(w, trainingInput, trainingOutput);
 
-  if(reportW){ExportW("output-W.out", w, layerSizeList);}
+  if(reportW){
+    if(wExportFileName != NULL){
+      ExportW(wExportFileName,w);
+    }
+    else {
+      ExportW("output-W.out", w);
+    }
+  }
 } 

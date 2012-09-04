@@ -1,8 +1,8 @@
 double Frand();
 double RandomGaussian();
 void ImportTrainingSet(char *, double **, double **, int *);
-void ImportW(char *, double ***, int *);
-void ExportW(char *, double ***, int *);
+void ImportW(char *, double ***);
+void ExportW(char *, double ***);
 double Sigmoid(double);
 double SigmoidToDsigmoid(double);
 void PopulateW(double ***);
